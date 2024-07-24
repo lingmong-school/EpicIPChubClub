@@ -38,10 +38,11 @@ namespace Climbing
         [HideInInspector] public bool run;
         [HideInInspector] public bool jump;
         [HideInInspector] public bool drop;
+        [HideInInspector] public bool crouch; // coded by Rayn
 
         private void OnEnable()
         {
-            if(controls != null)
+            if (controls != null)
                 controls.Enable();
         }
 
@@ -53,7 +54,7 @@ namespace Climbing
 
         void Awake()
         {
-            //Hold and Release
+            // Hold and Release
             controls = new PlayerControls();
             controls.Player.Movement.performed += ctx => movement = ctx.ReadValue<Vector2>();
             controls.Player.Movement.canceled += ctx => movement = ctx.ReadValue<Vector2>();
@@ -63,6 +64,8 @@ namespace Climbing
             controls.Player.Drop.canceled += ctx => drop = ctx.ReadValueAsButton();
             controls.Player.Run.performed += ctx => run = ctx.ReadValueAsButton();
             controls.Player.Run.canceled += ctx => run = ctx.ReadValueAsButton();
+            controls.Player.Crouch.performed += ctx => crouch = ctx.ReadValueAsButton(); // coded by Rayn
+            controls.Player.Crouch.canceled += ctx => crouch = ctx.ReadValueAsButton(); // coded by Rayn
             controls.GameManager.Exit.performed += ctx => Exit();
         }
 
@@ -76,8 +79,7 @@ namespace Climbing
 
         void Exit()
         {
-            Application.Quit();
+            UnityEngine.Application.Quit(); // Fully qualify Application.Quit() to resolve ambiguity
         }
     }
-
 }

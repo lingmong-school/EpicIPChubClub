@@ -1,28 +1,4 @@
-﻿/*
-MIT License
-
-Copyright (c) 2023 Èric Canela
-Contact: knela96@gmail.com or @knela96 twitter
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (Dynamic Parkour System), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,6 +27,7 @@ namespace Climbing
         [HideInInspector] public bool inSlope = false;
         [HideInInspector] public bool isVaulting = false;
         [HideInInspector] public bool dummy = false;
+        [HideInInspector] public bool isCrouching = false; // coded by Rayn
 
         [Header("Cameras")]
         public CameraController cameraController;
@@ -64,9 +41,12 @@ namespace Climbing
         [Header("Colliders")]
         public CapsuleCollider normalCapsuleCollider;
         public CapsuleCollider slidingCapsuleCollider;
+        public float crouchHeight = 1.0f; // coded by Rayn
 
         private float turnSmoothTime = 0.1f;
         private float turnSmoothVelocity;
+        private float originalHeight;
+        private float originalSpeed;
 
         private void Awake()
         {
@@ -76,8 +56,11 @@ namespace Climbing
             characterDetection = GetComponent<DetectionCharacterController>();
             vaultingController = GetComponent<VaultingController>();
 
+            originalHeight = normalCapsuleCollider.height;
+            originalSpeed = characterMovement.walkSpeed;
+
             if (cameraController == null)
-                Debug.LogError("Attach the Camera Controller located in the Free Look Camera");
+                UnityEngine.Debug.LogError("Attach the Camera Controller located in the Free Look Camera");
         }
 
         private void Start()
@@ -88,51 +71,65 @@ namespace Climbing
 
         void Update()
         {
-            //Detect if Player is on Ground
+            // Detect if Player is on Ground
             isGrounded = OnGround();
 
-            //Get Input if controller and movement are not disabled
+            // Get Input if controller and movement are not disabled
             if (!dummy && allowMovement)
             {
                 AddMovementInput(characterInput.movement);
 
-                //Detects if Joystick is being pushed hard
-                if (characterInput.run && characterInput.movement.magnitude > 0.5f)
+                // Detects if Joystick is being pushed hard
+                if (characterInput.run && characterInput.movement.magnitude > 0.5f && !isCrouching)
                 {
                     ToggleRun();
                 }
-                else if (!characterInput.run)
+                else if (!characterInput.run || isCrouching)
                 {
                     ToggleWalk();
                 }
+
+                // Handle crouching input (coded by Rayn)
+                HandleCrouch();
             }
         }
 
+        /// <summary>
+        /// Detects if the player is on the ground.
+        /// </summary>
+        /// <returns>True if the player is on the ground, false otherwise.</returns>
         private bool OnGround()
         {
             return characterDetection.IsGrounded(stepHeight);
         }
 
+        /// <summary>
+        /// Adds movement input to the character.
+        /// </summary>
+        /// <param name="direction">The direction of movement input.</param>
         public void AddMovementInput(Vector2 direction)
         {
             Vector3 translation = Vector3.zero;
-
             translation = GroundMovement(direction);
-
             characterMovement.SetVelocity(Vector3.ClampMagnitude(translation, 1.0f));
         }
 
+        /// <summary>
+        /// Calculates ground movement based on input.
+        /// </summary>
+        /// <param name="input">The input direction.</param>
+        /// <returns>The calculated movement vector.</returns>
         Vector3 GroundMovement(Vector2 input)
         {
             Vector3 direction = new Vector3(input.x, 0f, input.y).normalized;
 
-            //Gets direction of movement relative to the camera rotation
+            // Gets direction of movement relative to the camera rotation
             freeCamera.eulerAngles = new Vector3(0, mainCamera.eulerAngles.y, 0);
             Vector3 translation = freeCamera.transform.forward * input.y + freeCamera.transform.right * input.x;
             translation.y = 0;
 
-            //Detects if player is moving to any direction
-            if (translation.magnitude > 0)
+            // Detects if player is moving in any direction
+            if (translation.magnitude > 0) 
             {
                 RotatePlayer(direction);
                 characterAnimation.animator.SetBool("Released", false);
@@ -146,29 +143,45 @@ namespace Climbing
             return translation;
         }
 
+        /// <summary>
+        /// Rotates the player to face the given direction.
+        /// </summary>
+        /// <param name="direction">The direction to face.</param>
         public void RotatePlayer(Vector3 direction)
         {
-            //Get direction with camera rotation
+            // Get direction with camera rotation
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
 
-            //Rotate Mesh to Movement
+            // Rotate Mesh to Movement
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
         }
+
+        /// <summary>
+        /// Rotates the player to face the camera direction.
+        /// </summary>
+        /// <param name="direction">The direction to face.</param>
+        /// <returns>The calculated rotation.</returns>
         public Quaternion RotateToCameraDirection(Vector3 direction)
         {
-            //Get direction with camera rotation
+            // Get direction with camera rotation
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
 
-            //Rotate Mesh to Movement
+            // Rotate Mesh to Movement
             return Quaternion.Euler(0f, targetAngle, 0f);
         }
 
+        /// <summary>
+        /// Resets the movement of the character.
+        /// </summary>
         public void ResetMovement()
         {
             characterMovement.ResetSpeed();
         }
 
+        /// <summary>
+        /// Toggles the character's running state.
+        /// </summary>
         public void ToggleRun()
         {
             if (characterMovement.GetState() != MovementState.Running)
@@ -178,22 +191,63 @@ namespace Climbing
                 characterAnimation.animator.SetBool("Run", true);
             }
         }
+
+        /// <summary>
+        /// Toggles the character's walking state.
+        /// </summary>
         public void ToggleWalk()
         {
             if (characterMovement.GetState() != MovementState.Walking)
             {
                 characterMovement.SetCurrentState(MovementState.Walking);
-                characterMovement.curSpeed = characterMovement.walkSpeed;
+                characterMovement.curSpeed = isCrouching ? originalSpeed / 2 : characterMovement.walkSpeed; // Halve speed if crouching (coded by Rayn)
                 characterAnimation.animator.SetBool("Run", false);
             }
         }
 
+        /// <summary>
+        /// Handles the character's crouching state. (coded by Rayn)
+        /// </summary>
+        public void HandleCrouch()
+        {
+            if (characterInput.crouch)
+            {
+                if (!isCrouching)
+                {
+                    isCrouching = true;
+                    characterAnimation.animator.SetBool("Crouch", true);
+                    normalCapsuleCollider.height = crouchHeight;
+                    characterMovement.curSpeed = originalSpeed / 2; // Reduce speed to half when crouching
 
+
+                }
+            }
+            else
+            {
+                if (isCrouching)
+                {
+                    isCrouching = false;
+                    characterAnimation.animator.SetBool("Crouch", false);
+                    normalCapsuleCollider.height = originalHeight;
+                    characterMovement.curSpeed = originalSpeed; // Restore original speed when not crouching
+
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the current velocity of the character.
+        /// </summary>
+        /// <returns>The current velocity.</returns>
         public float GetCurrentVelocity()
         {
             return characterMovement.GetVelocity().magnitude;
         }
 
+        /// <summary>
+        /// Disables the character controller.
+        /// </summary>
         public void DisableController()
         {
             characterMovement.SetKinematic(true);
@@ -201,13 +255,17 @@ namespace Climbing
             dummy = true;
             allowMovement = false;
         }
+
+        /// <summary>
+        /// Enables the character controller.
+        /// </summary>
         public void EnableController()
         {
             characterMovement.SetKinematic(false);
             characterMovement.EnableFeetIK();
             characterMovement.ApplyGravity();
             characterMovement.stopMotion = false;
-            dummy = false; 
+            dummy = false;
             allowMovement = true;
         }
     }

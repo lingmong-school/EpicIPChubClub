@@ -11,7 +11,8 @@
                     "id": "80ac0de8-0bf4-4c19-8259-f56562102e5d",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -49,7 +50,8 @@
                     "id": "8109a10c-b867-462e-a485-fa6485b84d6c",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Run",
@@ -57,7 +59,8 @@
                     "id": "81986dfc-5596-40f0-ad8e-8a5ee9d1aacd",
                     "expectedControlType": "Touch",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Drop",
@@ -65,7 +68,8 @@
                     "id": "17aa0581-88b0-4d2f-95fc-73e0a82d5bf7",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Jump",
@@ -73,7 +77,17 @@
                     "id": "5c8f3721-bf82-419f-8ab1-fe71c1427aae",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "39d5def9-a7cc-46c5-a407-85d40eeb8cd7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -208,6 +222,17 @@
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0b8aa5dc-e9d1-4877-af45-c064c144eb79",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard n Mouse",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -221,7 +246,8 @@
                     "id": "82507f7d-ff5e-4598-840e-f499a4ab25c5",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
