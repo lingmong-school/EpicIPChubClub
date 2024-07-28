@@ -19,6 +19,8 @@ public class EnemyBack : MonoBehaviour
 
     private Animator animator;
     public CapsuleCollider capsuleCollider;
+    public EnemyBehavior enemyBehavior;
+    public Canvas detectionUI;
 
     [Header("Effects")]
     public ParticleSystem bloodSplatter; // Reference to the blood splatter particle system
@@ -65,6 +67,9 @@ public class EnemyBack : MonoBehaviour
     {
         animator.SetBool("Dead", true);
         capsuleCollider.enabled = false;
+        enemyBehavior.enabled = false;
+        detectionUI.enabled = false;
+
 
         if (bloodSplatter != null)
         {
