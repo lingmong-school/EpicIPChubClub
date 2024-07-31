@@ -200,7 +200,7 @@ namespace Climbing
             if (characterMovement.GetState() != MovementState.Walking)
             {
                 characterMovement.SetCurrentState(MovementState.Walking);
-                characterMovement.curSpeed = isCrouching ? originalSpeed / 2 : characterMovement.walkSpeed; // Halve speed if crouching (coded by Rayn)
+                characterMovement.curSpeed = isCrouching ? originalSpeed / 1.2f : characterMovement.walkSpeed; // Halve speed if crouching (coded by Rayn)
                 characterAnimation.animator.SetBool("Run", false);
             }
         }
@@ -217,7 +217,7 @@ namespace Climbing
                     isCrouching = true;
                     characterAnimation.animator.SetBool("Crouch", true);
                     normalCapsuleCollider.height = crouchHeight;
-                    characterMovement.curSpeed = originalSpeed / 2; // Reduce speed to half when crouching
+                    characterMovement.curSpeed = originalSpeed / 1.2f; // Reduce speed to half when crouching
 
 
                 }

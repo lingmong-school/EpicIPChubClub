@@ -20,11 +20,30 @@ public class PlayerAttack : MonoBehaviour
     private PlayerControls controls;
     private Animator animator;
 
+    public List<AttackSO> combo;
+    float lastClickedTime;
+    float lastComboEnd;
+    int comboCounter;
+
+    // Cooldown time for AttackM1
+    public float attackCooldown = 1f;
+    private float lastAttackTime;
+
+    // VFX
+    public GameObject swing1VFX;
+    public GameObject swing2VFX;
+    public GameObject swing3VFX;
+
     private void Awake()
     {
         controls = new PlayerControls();
-        controls.Player.Attack.performed += ctx => Attack();
+        controls.Player.Click.performed += ctx => Attack();
         animator = GetComponent<Animator>();
+
+        if (animator.runtimeAnimatorController == null)
+        {
+            Debug.LogError("Animator does not have an AnimatorController assigned.");
+        }
     }
 
     private void OnEnable()
@@ -35,6 +54,11 @@ public class PlayerAttack : MonoBehaviour
     private void OnDisable()
     {
         controls.Disable();
+    }
+
+    void Update()
+    {
+        ExitAttackM1();
     }
 
     /// <summary>
@@ -53,7 +77,7 @@ public class PlayerAttack : MonoBehaviour
         }
         else
         {
-            Debug.Log("Player cannot attack");
+            AttackM1();
         }
     }
 
@@ -78,6 +102,75 @@ public class PlayerAttack : MonoBehaviour
         if (enemyBack != null && enemyBack.canAttack)
         {
             enemyBack.TriggerDeath();
+        }
+    }
+
+    void AttackM1()
+    {
+        if (Time.time - lastAttackTime >= attackCooldown)
+        {
+            if (Time.time - lastComboEnd > 0.2f && comboCounter < combo.Count)
+            {
+                CancelInvoke("EndCombo");
+
+                if (Time.time - lastClickedTime >= 0.2f)
+                {
+                    // Activate the hidden blade at the start of the attack
+                    hiddenBlade.ActivateBlade();
+
+                    animator.runtimeAnimatorController = combo[comboCounter].animatorOV;
+                    animator.Play("Attack", 0, 0);
+                    // weapon.damage = combo[comboCounter].damage;
+                    comboCounter++;
+                    lastClickedTime = Time.time;
+                    lastAttackTime = Time.time;
+
+                    if (comboCounter >= combo.Count)
+                    {
+                        comboCounter = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    void ExitAttackM1()
+    {
+        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.9f && animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
+        {
+            Invoke("EndCombo", 1);
+        }
+    }
+
+    void EndCombo()
+    {
+        comboCounter = 0;
+        lastComboEnd = Time.time;
+        // Deactivate the hidden blade after the combo ends
+        hiddenBlade.DeactivateBlade();
+    }
+
+    // Animation event methods
+    public void swing1()
+    {
+        PlayVFX(swing1VFX);
+    }
+
+    public void swing2()
+    {
+        PlayVFX(swing2VFX);
+    }
+
+    public void swing3()
+    {
+        PlayVFX(swing3VFX);
+    }
+
+    private void PlayVFX(GameObject vfx)
+    {
+        if (vfx != null)
+        {
+            Instantiate(vfx, transform.position, transform.rotation);
         }
     }
 }
