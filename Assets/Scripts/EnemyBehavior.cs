@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+
 public class EnemyBehavior : MonoBehaviour
 {
     public NavMeshAgent agent;
@@ -12,16 +13,16 @@ public class EnemyBehavior : MonoBehaviour
     public LayerMask whatIsGround, whatIsPlayer;
     public float health;
 
-    //Patrolling
+    // Patrolling
     public Vector3 walkPoint;
     bool walkPointSet;
     public float walkPointRange;
 
-    //Attacking
+    // Attacking
     public float timeBetweenAttacks;
     bool alreadyAttacked;
 
-    //States
+    // States
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
 
@@ -46,6 +47,9 @@ public class EnemyBehavior : MonoBehaviour
     public GameObject attentionCanvas; // Reference to the canvas GameObject
     public Image attentionBar;
     private Camera playerCamera;
+
+    // Damage delay
+    private bool canTakeDamage = true;
 
     private void Start()
     {
@@ -252,16 +256,40 @@ public class EnemyBehavior : MonoBehaviour
         alreadyAttacked = false;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
-        health -= damage;
-
-        if (health <= 0) Invoke(nameof(DestroyEnemy), 0.5f);
+        if (canTakeDamage)
+        {
+            canTakeDamage = false;
+            StartCoroutine(DamageCooldown(damage));
+        }
     }
 
-    private void DestroyEnemy()
+    private IEnumerator DamageCooldown(float damage)
     {
-        Destroy(gameObject);
+        health -= damage;
+        Debug.Log($"Enemy took {damage} damage. Remaining health: {health}");
+
+        if (health <= 0)
+        {
+            Invoke(nameof(TriggerDeath), 0.5f); // Changed from DestroyEnemy to TriggerDeath
+        }
+
+        yield return new WaitForSeconds(0.5f);
+        canTakeDamage = true;
+    }
+
+    private void TriggerDeath()
+    {
+        var enemyBack = GetComponent<EnemyBack>();
+        if (enemyBack != null)
+        {
+            enemyBack.FrontDeath();
+        }
+        else
+        {
+            Debug.LogError("EnemyBack component not found.");
+        }
     }
 
     private void OnDrawGizmosSelected()

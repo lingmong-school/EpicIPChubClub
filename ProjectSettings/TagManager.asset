@@ -12,6 +12,7 @@ TagManager:
   - Ledge
   - BackstabKnife
   - Ground
+  - Enemy
   layers:
   - Default
   - TransparentFX

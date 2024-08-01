@@ -21,6 +21,7 @@ public class EnemyBack : MonoBehaviour
     public CapsuleCollider capsuleCollider;
     public EnemyBehavior enemyBehavior;
     public Canvas detectionUI;
+    public BoxCollider boxCollider;
 
     [Header("Effects")]
     public ParticleSystem bloodSplatter; // Reference to the blood splatter particle system
@@ -69,7 +70,7 @@ public class EnemyBack : MonoBehaviour
         capsuleCollider.enabled = false;
         enemyBehavior.enabled = false;
         detectionUI.enabled = false;
-
+        boxCollider.enabled = false;
 
         if (bloodSplatter != null)
         {
@@ -82,5 +83,30 @@ public class EnemyBack : MonoBehaviour
         }
 
         Debug.Log("Enemy death triggered, collider disabled, and effects played");
+        StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(4f);
+        Destroy(gameObject);
+    }
+
+    public void FrontDeath()
+    {
+        animator.SetBool("Dead", true);
+        capsuleCollider.enabled = false;
+        enemyBehavior.enabled = false;
+        detectionUI.enabled = false;
+        boxCollider.enabled = false;
+
+        if (bloodSplatter != null)
+        {
+            bloodSplatter.Play();
+        }
+
+
+        Debug.Log("Enemy death triggered, collider disabled, and effects played");
+        StartCoroutine(DestroyAfterDelay());
     }
 }

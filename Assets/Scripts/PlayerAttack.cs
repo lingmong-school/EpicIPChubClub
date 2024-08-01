@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.VFX; // Add this for Visual Effect Graph
 
 /// <summary>
 /// Manages the player's attack input, allowing attacks only when the enemy can attack.
@@ -30,9 +31,9 @@ public class PlayerAttack : MonoBehaviour
     private float lastAttackTime;
 
     // VFX
-    public GameObject swing1VFX;
-    public GameObject swing2VFX;
-    public GameObject swing3VFX;
+    public VisualEffect swing1VFX;
+    public VisualEffect swing2VFX;
+    public VisualEffect swing3VFX;
 
     private void Awake()
     {
@@ -44,6 +45,11 @@ public class PlayerAttack : MonoBehaviour
         {
             Debug.LogError("Animator does not have an AnimatorController assigned.");
         }
+
+        // Ensure VFX components are assigned
+        if (swing1VFX == null) Debug.LogError("swing1VFX is not assigned.");
+        if (swing2VFX == null) Debug.LogError("swing2VFX is not assigned.");
+        if (swing3VFX == null) Debug.LogError("swing3VFX is not assigned.");
     }
 
     private void OnEnable()
@@ -154,23 +160,27 @@ public class PlayerAttack : MonoBehaviour
     public void swing1()
     {
         PlayVFX(swing1VFX);
+        Debug.Log("Swing1 VFX played");
     }
 
     public void swing2()
     {
         PlayVFX(swing2VFX);
+        Debug.Log("Swing2 VFX played");
     }
 
     public void swing3()
     {
         PlayVFX(swing3VFX);
+        Debug.Log("Swing3 VFX played");
     }
 
-    private void PlayVFX(GameObject vfx)
+    private void PlayVFX(VisualEffect vfx)
     {
         if (vfx != null)
         {
-            Instantiate(vfx, transform.position, transform.rotation);
+            vfx.transform.position = transform.position + new Vector3(0, 1, 0);
+            vfx.Play();
         }
     }
 }
