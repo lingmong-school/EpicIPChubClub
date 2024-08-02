@@ -38,7 +38,8 @@ public class PlayerAttack : MonoBehaviour
     private void Awake()
     {
         controls = new PlayerControls();
-        controls.Player.Click.performed += ctx => Attack();
+        controls.Player.Attack.performed += ctx => Attack();
+        controls.Player.Click.performed += ctx => AttackM1();
         animator = GetComponent<Animator>();
 
         if (animator.runtimeAnimatorController == null)
@@ -81,10 +82,7 @@ public class PlayerAttack : MonoBehaviour
             animator.SetBool("Backstab", true);
             Debug.Log("Player attacks with Backstab");
         }
-        else
-        {
-            AttackM1();
-        }
+        
     }
 
     /// <summary>
