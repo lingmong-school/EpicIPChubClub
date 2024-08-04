@@ -1,6 +1,5 @@
-
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -13,16 +12,13 @@ public class EnemyBehavior : MonoBehaviour
     public LayerMask whatIsGround, whatIsPlayer;
     public float health;
 
-    // Patrolling
     public Vector3 walkPoint;
     bool walkPointSet;
     public float walkPointRange;
 
-    // Attacking
     public float timeBetweenAttacks;
     bool alreadyAttacked;
 
-    // States
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
 
@@ -37,19 +33,29 @@ public class EnemyBehavior : MonoBehaviour
 
     public bool canSeePlayer;
 
-    // Attention Level
-    public float attentionTime = 5f; // Time in seconds to fully detect the player
+    public float attentionTime = 5f;
     private float attentionLevel;
     private bool fullyDetected;
     private Coroutine attentionCoroutine;
 
-    // UI Elements
-    public GameObject attentionCanvas; // Reference to the canvas GameObject
+    public GameObject attentionCanvas;
     public Image attentionBar;
     private Camera playerCamera;
 
-    // Damage delay
     private bool canTakeDamage = true;
+    private bool isSandyActive = false; // New flag to track if Sandy is active
+
+    private void OnEnable()
+    {
+        AbilityHandler.OnSandyActivated += HandleSandyActivated;
+        AbilityHandler.OnSandyDeactivated += HandleSandyDeactivated;
+    }
+
+    private void OnDisable()
+    {
+        AbilityHandler.OnSandyActivated -= HandleSandyActivated;
+        AbilityHandler.OnSandyDeactivated -= HandleSandyDeactivated;
+    }
 
     private void Start()
     {
@@ -57,7 +63,6 @@ public class EnemyBehavior : MonoBehaviour
         playerCamera = Camera.main;
         StartCoroutine(FOVRoutine());
 
-        // Ensure the attention bar is set to 0 fill at the start and canvas is inactive
         if (attentionBar != null)
         {
             attentionBar.fillAmount = 0f;
@@ -82,6 +87,26 @@ public class EnemyBehavior : MonoBehaviour
 
     private void FieldOfViewCheck()
     {
+        if (isSandyActive)
+        {
+            canSeePlayer = false;
+            if (attentionCoroutine != null)
+            {
+                StopCoroutine(attentionCoroutine);
+                attentionCoroutine = null;
+                attentionLevel = 0f;
+                if (attentionBar != null)
+                {
+                    attentionBar.fillAmount = 0f;
+                }
+                if (attentionCanvas != null)
+                {
+                    attentionCanvas.SetActive(false);
+                }
+            }
+            return;
+        }
+
         Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);
 
         if (rangeChecks.Length != 0)
@@ -105,7 +130,7 @@ public class EnemyBehavior : MonoBehaviour
 
                         if (attentionCanvas != null)
                         {
-                            attentionCanvas.SetActive(true); // Activate the canvas
+                            attentionCanvas.SetActive(true);
                         }
                     }
                 }
@@ -128,14 +153,14 @@ public class EnemyBehavior : MonoBehaviour
         {
             StopCoroutine(attentionCoroutine);
             attentionCoroutine = null;
-            attentionLevel = 0f; // Reset attention level if the player is not in sight
+            attentionLevel = 0f;
             if (attentionBar != null)
             {
-                attentionBar.fillAmount = 0f; // Reset the attention bar
+                attentionBar.fillAmount = 0f;
             }
             if (attentionCanvas != null)
             {
-                attentionCanvas.SetActive(false); // Deactivate the canvas
+                attentionCanvas.SetActive(false);
             }
         }
     }
@@ -144,12 +169,12 @@ public class EnemyBehavior : MonoBehaviour
     {
         while (attentionLevel < attentionTime)
         {
-            attentionLevel += .1f; // Increment attention level every second (adjust as needed)
+            attentionLevel += .1f;
             UpdateAttentionBar();
             yield return new WaitForSeconds(.1f);
         }
 
-        fullyDetected = true; // Player is fully detected
+        fullyDetected = true;
         Debug.Log("Player fully detected!");
     }
 
@@ -165,15 +190,13 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (attentionBar != null && playerCamera != null)
         {
-            // Make the attention bar face the player's camera
             attentionBar.transform.LookAt(playerCamera.transform);
-            attentionBar.transform.Rotate(0, 180, 0); // Adjust if the image is facing the wrong direction
+            attentionBar.transform.Rotate(0, 180, 0);
         }
     }
 
     private void Awake()
     {
-        // Debug log to check if the player object is found
         GameObject playerObj = GameObject.Find("PlayerObj");
         if (playerObj == null)
         {
@@ -193,7 +216,8 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Update()
     {
-        // Check for sight and attack range
+        if (isSandyActive) return; // Skip the update if Sandy is active
+
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
         if (!canSeePlayer && !playerInAttackRange) Patroling();
@@ -210,16 +234,14 @@ public class EnemyBehavior : MonoBehaviour
 
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
 
-        // Walkpoint reached
         if (distanceToWalkPoint.magnitude < 1f)
             walkPointSet = false;
     }
 
     private void SearchWalkPoint()
     {
-        // Calculate random point in range
-        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        float randomX = Random.Range(-walkPointRange, walkPointRange);
+        float randomZ = UnityEngine.Random.Range(-walkPointRange, walkPointRange);
+        float randomX = UnityEngine.Random.Range(-walkPointRange, walkPointRange);
 
         walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
 
@@ -235,16 +257,13 @@ public class EnemyBehavior : MonoBehaviour
 
     private void AttackPlayer()
     {
-        // Make sure enemy doesn't move
         agent.SetDestination(transform.position);
 
         transform.LookAt(player);
 
         if (!alreadyAttacked)
         {
-            /// Attack code here
             Debug.Log("NPC attack");
-            /// End of attack code
 
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
@@ -272,7 +291,7 @@ public class EnemyBehavior : MonoBehaviour
 
         if (health <= 0)
         {
-            Invoke(nameof(TriggerDeath), 0.5f); // Changed from DestroyEnemy to TriggerDeath
+            Invoke(nameof(TriggerDeath), 0.5f);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -297,5 +316,29 @@ public class EnemyBehavior : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
         Gizmos.color = Color.yellow;
+    }
+
+    private void HandleSandyActivated()
+    {
+        Debug.Log("Sandy activated, slowing down enemy behavior.");
+        isSandyActive = true;
+        agent.speed *= 0.5f; // Halve the agent speed
+        timeBetweenAttacks *= 2f; // Double the attack interval
+        if (TryGetComponent<Animator>(out var animator))
+        {
+            animator.speed *= 0.5f; // Halve the animation speed
+        }
+    }
+
+    private void HandleSandyDeactivated()
+    {
+        Debug.Log("Sandy deactivated, restoring enemy behavior.");
+        isSandyActive = false;
+        agent.speed *= 2f; // Restore the agent speed
+        timeBetweenAttacks /= 2f; // Restore the attack interval
+        if (TryGetComponent<Animator>(out var animator))
+        {
+            animator.speed *= 2f; // Restore the animation speed
+        }
     }
 }

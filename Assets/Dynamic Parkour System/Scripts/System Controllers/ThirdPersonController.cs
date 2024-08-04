@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -129,7 +128,7 @@ namespace Climbing
             translation.y = 0;
 
             // Detects if player is moving in any direction
-            if (translation.magnitude > 0) 
+            if (translation.magnitude > 0)
             {
                 RotatePlayer(direction);
                 characterAnimation.animator.SetBool("Released", false);
@@ -218,8 +217,6 @@ namespace Climbing
                     characterAnimation.animator.SetBool("Crouch", true);
                     normalCapsuleCollider.height = crouchHeight;
                     characterMovement.curSpeed = originalSpeed / 1.2f; // Reduce speed to half when crouching
-
-
                 }
             }
             else
@@ -230,8 +227,6 @@ namespace Climbing
                     characterAnimation.animator.SetBool("Crouch", false);
                     normalCapsuleCollider.height = originalHeight;
                     characterMovement.curSpeed = originalSpeed; // Restore original speed when not crouching
-
-
                 }
             }
         }

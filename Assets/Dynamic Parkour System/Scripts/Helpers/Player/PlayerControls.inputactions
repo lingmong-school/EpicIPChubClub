@@ -108,7 +108,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Dash",
+                    "name": "Block",
                     "type": "Button",
                     "id": "b57a0875-4e73-463d-8bd1-b5e29c602a2a",
                     "expectedControlType": "Button",
@@ -299,7 +299,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dash",
+                    "action": "Block",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

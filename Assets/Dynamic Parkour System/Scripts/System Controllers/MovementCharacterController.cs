@@ -1,28 +1,4 @@
-﻿/*
-MIT License
-
-Copyright (c) 2023 Èric Canela
-Contact: knela96@gmail.com or @knela96 twitter
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (Dynamic Parkour System), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -63,11 +39,11 @@ namespace Climbing
         public bool enableFeetIK = true;
 
         [SerializeField] private float heightFromGroundRaycast = 0.7f;
-        [Range(0, 2f)] [SerializeField] private float raycastDownDistance = 1.5f;
+        [Range(0, 2f)][SerializeField] private float raycastDownDistance = 1.5f;
         [SerializeField] private float pelvisOffset = 0f;
 
-        [Range(0, 1f)] [SerializeField] private float pelvisUpDownSpeed = 0.25f;
-        [Range(0, 1f)] [SerializeField] private float feetToIKPositionSpeed = 0.25f;
+        [Range(0, 1f)][SerializeField] private float pelvisUpDownSpeed = 0.25f;
+        [Range(0, 1f)][SerializeField] private float feetToIKPositionSpeed = 0.25f;
 
         public string leftFootAnim = "LeftFootCurve";
         public string rightFootAnim = "RightFootCurve";
@@ -275,8 +251,9 @@ namespace Climbing
             return false;
         }
 
-        public Vector3 GetVelocity() { 
-            return rb.velocity; 
+        public Vector3 GetVelocity()
+        {
+            return rb.velocity;
         }
 
         public void SetVelocity(Vector3 value)
@@ -453,7 +430,7 @@ namespace Climbing
             }
             else if (controller.characterDetection.ThrowRayOnDirection(transform.position + offset, transform.TransformDirection(new Vector3(-1.5f, 0, 1)), controller.slidingCapsuleCollider.radius + 0.1f, out hit))
             {
-                if (!controller.characterDetection.ThrowRayOnDirection(transform.position + offset + new Vector3(0, controller.stepHeight, 0), transform.TransformDirection(new Vector3(-1.5f,0,1)), controller.slidingCapsuleCollider.radius + 0.2f, out hit))
+                if (!controller.characterDetection.ThrowRayOnDirection(transform.position + offset + new Vector3(0, controller.stepHeight, 0), transform.TransformDirection(new Vector3(-1.5f, 0, 1)), controller.slidingCapsuleCollider.radius + 0.2f, out hit))
                 {
                     rb.position += new Vector3(0, controller.stepVelocity, 0);
                 }
@@ -469,5 +446,4 @@ namespace Climbing
 
         #endregion 
     }
-
 }

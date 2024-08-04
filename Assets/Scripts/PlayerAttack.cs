@@ -1,15 +1,9 @@
-/*
- 
-Author: Rayn Kamaludin
-Date: 25/7/2024
-Description: Player backstab enemy
-*/
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX; // Add this for Visual Effect Graph
+using Climbing; // Add this to access MovementState and MovementCharacterController
 
 /// <summary>
 /// Manages the player's attack input, allowing attacks only when the enemy can attack.
@@ -20,6 +14,7 @@ public class PlayerAttack : MonoBehaviour
     public HiddenBlade hiddenBlade; // Reference to the HiddenBlade script
     private PlayerControls controls;
     private Animator animator;
+    private MovementCharacterController movementCharacterController; // Reference to the MovementCharacterController
 
     public List<AttackSO> combo;
     float lastClickedTime;
@@ -41,6 +36,7 @@ public class PlayerAttack : MonoBehaviour
         controls.Player.Attack.performed += ctx => Attack();
         controls.Player.Click.performed += ctx => AttackM1();
         animator = GetComponent<Animator>();
+        movementCharacterController = GetComponent<MovementCharacterController>(); // Get the MovementCharacterController component
 
         if (animator.runtimeAnimatorController == null)
         {
@@ -73,6 +69,11 @@ public class PlayerAttack : MonoBehaviour
     /// </summary>
     private void Attack()
     {
+        if (movementCharacterController.GetState() != MovementState.Walking && movementCharacterController.GetState() != MovementState.Running)
+        {
+            return; // Return if the player is not in walking or running state
+        }
+
         if (enemyBack != null && enemyBack.canAttack)
         {
             // Activate the hidden blade
@@ -82,7 +83,6 @@ public class PlayerAttack : MonoBehaviour
             animator.SetBool("Backstab", true);
             Debug.Log("Player attacks with Backstab");
         }
-        
     }
 
     /// <summary>
@@ -111,6 +111,11 @@ public class PlayerAttack : MonoBehaviour
 
     void AttackM1()
     {
+        if (movementCharacterController.GetState() != MovementState.Walking && movementCharacterController.GetState() != MovementState.Running)
+        {
+            return; // Return if the player is not in walking or running state
+        }
+
         if (Time.time - lastAttackTime >= attackCooldown)
         {
             if (Time.time - lastComboEnd > 0.2f && comboCounter < combo.Count)

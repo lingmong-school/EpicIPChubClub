@@ -1,57 +1,67 @@
-/*
- 
-Author: Rayn Kamaludin
-Date: 2/8/2024
-Description: Handles the calling of abilities such as the input and cooldown time for abilities like Dash and Sandy.
-*/
-
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using Climbing; // Add this namespace import
 
-/// <summary>
-/// Manages the abilities of the player, handling input and cooldown times.
-/// </summary>
 public class AbilityHandler : MonoBehaviour
 {
     private PlayerControls controls;
-    private bool canDash = true;
+    private bool canBlock = true;
     private bool canSandy = true;
-    public float dashCooldown = 5f;
+    public float blockCooldown = 5f;
     public float sandyCooldown = 10f;
+    public float sandyDuration = 5f;
 
-    /// <summary>
-    /// The UI image that indicates the cooldown progress for Dash.
-    /// </summary>
-    public Image dashCooldownIndicator;
-
-    /// <summary>
-    /// The UI image that indicates the cooldown progress for Sandy.
-    /// </summary>
+    public Image blockCooldownIndicator;
     public Image sandyCooldownIndicator;
 
-    /// <summary>
-    /// Initializes the player controls.
-    /// </summary>
+    private Blocking blockingScript;
+    private Sandevistan sandevistanScript;
+    public MovementCharacterController movementCharacterController;
+    public Volume globalVolume;
+    private ColorAdjustments colorAdjustments;
+    private Vignette vignette;
+
+    public static event System.Action OnSandyActivated;
+    public static event System.Action OnSandyDeactivated;
+
     private void Awake()
     {
         controls = new PlayerControls();
+        blockingScript = GetComponent<Blocking>();
+        sandevistanScript = GetComponent<Sandevistan>();
+        if (globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
+        {
+            Debug.Log("Color Adjustments found in the Volume profile.");
+        }
+        else
+        {
+            Debug.LogError("Color Adjustments not found in the Volume profile.");
+        }
+
+        if (globalVolume.profile.TryGet<Vignette>(out vignette))
+        {
+            Debug.Log("Vignette found in the Volume profile.");
+        }
+        else
+        {
+            Debug.LogError("Vignette not found in the Volume profile.");
+        }
     }
 
-    /// <summary>
-    /// Enables the player controls and subscribes to the ability input actions.
-    /// </summary>
     private void OnEnable()
     {
         controls.Enable();
-        controls.Player.Dash.performed += OnDashPerformed;
+        controls.Player.Block.performed += OnBlockPerformed;
         controls.Player.Ultimate.performed += OnSandyPerformed;
 
-        // Ensure the cooldown indicators start at full
-        if (dashCooldownIndicator != null)
+        if (blockCooldownIndicator != null)
         {
-            dashCooldownIndicator.fillAmount = 1f;
+            blockCooldownIndicator.fillAmount = 1f;
         }
         if (sandyCooldownIndicator != null)
         {
@@ -59,34 +69,21 @@ public class AbilityHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Disables the player controls and unsubscribes from the ability input actions.
-    /// </summary>
     private void OnDisable()
     {
         controls.Disable();
-        controls.Player.Dash.performed -= OnDashPerformed;
+        controls.Player.Block.performed -= OnBlockPerformed;
         controls.Player.Ultimate.performed -= OnSandyPerformed;
     }
 
-    /// <summary>
-    /// Called when the Dash input action is performed.
-    /// Starts the Dash coroutine if the player can dash.
-    /// </summary>
-    /// <param name="context">The context of the input action.</param>
-    private void OnDashPerformed(InputAction.CallbackContext context)
+    private void OnBlockPerformed(InputAction.CallbackContext context)
     {
-        if (canDash)
+        if (canBlock)
         {
-            StartCoroutine(Dash());
+            StartCoroutine(Block());
         }
     }
 
-    /// <summary>
-    /// Called when the Sandy input action is performed.
-    /// Starts the Sandy coroutine if the player can use Sandy.
-    /// </summary>
-    /// <param name="context">The context of the input action.</param>
     private void OnSandyPerformed(InputAction.CallbackContext context)
     {
         if (canSandy)
@@ -95,56 +92,75 @@ public class AbilityHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Handles the Dash ability, implementing the dash logic and cooldown.
-    /// </summary>
-    /// <returns>IEnumerator for the coroutine.</returns>
-    private IEnumerator Dash()
+    private IEnumerator Block()
     {
-        Debug.Log("Dash performed!");
+        Debug.Log("Block performed!");
+        blockingScript.EnableBlock(1f);
 
-        // Implement dash logic here
-        // For example, you can move the player forward quickly
-
-        // Start cooldown
-        canDash = false;
-        if (dashCooldownIndicator != null)
+        canBlock = false;
+        if (blockCooldownIndicator != null)
         {
-            dashCooldownIndicator.fillAmount = 0f;
+            blockCooldownIndicator.fillAmount = 0f;
         }
 
         float elapsedTime = 0f;
-        while (elapsedTime < dashCooldown)
+        while (elapsedTime < blockCooldown)
         {
             elapsedTime += Time.deltaTime;
-            if (dashCooldownIndicator != null)
+            if (blockCooldownIndicator != null)
             {
-                dashCooldownIndicator.fillAmount = elapsedTime / dashCooldown;
+                blockCooldownIndicator.fillAmount = elapsedTime / blockCooldown;
             }
             yield return null;
         }
 
-        canDash = true;
-        if (dashCooldownIndicator != null)
+        canBlock = true;
+        if (blockCooldownIndicator != null)
         {
-            dashCooldownIndicator.fillAmount = 1f;
+            blockCooldownIndicator.fillAmount = 1f;
         }
 
-        Debug.Log("Dash cooldown finished, you can dash again.");
+        Debug.Log("Block cooldown finished, you can block again.");
     }
 
-    /// <summary>
-    /// Handles the Sandy ability, implementing the Sandy logic and cooldown.
-    /// </summary>
-    /// <returns>IEnumerator for the coroutine.</returns>
     private IEnumerator Sandy()
     {
         Debug.Log("Sandy performed!");
 
-        // Implement Sandy logic here
-        // For example, you can apply an ultimate effect
+        sandevistanScript.ActivateSandy();
+        movementCharacterController.SetCurrentState(MovementState.Walking);
+        OnSandyActivated?.Invoke();
 
-        // Start cooldown
+        if (colorAdjustments != null)
+        {
+            colorAdjustments.colorFilter.value = new Color(121f / 255f, 159f / 255f, 129f / 255f);
+        }
+
+        if (vignette != null)
+        {
+            StartCoroutine(AdjustVignette(vignette, 0f, 0.43f, sandyDuration));
+        }
+
+        float originalRunSpeed = movementCharacterController.RunSpeed;
+        movementCharacterController.RunSpeed = 9f;
+
+        yield return new WaitForSeconds(sandyDuration);
+
+        if (colorAdjustments != null)
+        {
+            colorAdjustments.colorFilter.value = Color.white;
+        }
+
+        if (vignette != null)
+        {
+            StartCoroutine(AdjustVignette(vignette, 0.43f, 0f, 0.1f));
+        }
+
+        movementCharacterController.RunSpeed = originalRunSpeed;
+        movementCharacterController.SetCurrentState(MovementState.Walking);
+
+        OnSandyDeactivated?.Invoke();
+
         canSandy = false;
         if (sandyCooldownIndicator != null)
         {
@@ -169,5 +185,17 @@ public class AbilityHandler : MonoBehaviour
         }
 
         Debug.Log("Sandy cooldown finished, you can use Sandy again.");
+    }
+
+    private IEnumerator AdjustVignette(Vignette vignette, float startValue, float endValue, float duration)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
+        {
+            vignette.intensity.value = Mathf.Lerp(startValue, endValue, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        vignette.intensity.value = endValue;
     }
 }

@@ -130,7 +130,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Dash"",
+                    ""name"": ""Block"",
                     ""type"": ""Button"",
                     ""id"": ""b57a0875-4e73-463d-8bd1-b5e29c602a2a"",
                     ""expectedControlType"": ""Button"",
@@ -321,7 +321,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Dash"",
+                    ""action"": ""Block"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -409,7 +409,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_Click = m_Player.FindAction("Click", throwIfNotFound: true);
-        m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
+        m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
         m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
         // GameManager
         m_GameManager = asset.FindActionMap("GameManager", throwIfNotFound: true);
@@ -528,7 +528,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_Click;
-    private readonly InputAction m_Player_Dash;
+    private readonly InputAction m_Player_Block;
     private readonly InputAction m_Player_Ultimate;
     public struct PlayerActions
     {
@@ -541,7 +541,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
         public InputAction @Click => m_Wrapper.m_Player_Click;
-        public InputAction @Dash => m_Wrapper.m_Player_Dash;
+        public InputAction @Block => m_Wrapper.m_Player_Block;
         public InputAction @Ultimate => m_Wrapper.m_Player_Ultimate;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -573,9 +573,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Click.started += instance.OnClick;
             @Click.performed += instance.OnClick;
             @Click.canceled += instance.OnClick;
-            @Dash.started += instance.OnDash;
-            @Dash.performed += instance.OnDash;
-            @Dash.canceled += instance.OnDash;
+            @Block.started += instance.OnBlock;
+            @Block.performed += instance.OnBlock;
+            @Block.canceled += instance.OnBlock;
             @Ultimate.started += instance.OnUltimate;
             @Ultimate.performed += instance.OnUltimate;
             @Ultimate.canceled += instance.OnUltimate;
@@ -604,9 +604,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Click.started -= instance.OnClick;
             @Click.performed -= instance.OnClick;
             @Click.canceled -= instance.OnClick;
-            @Dash.started -= instance.OnDash;
-            @Dash.performed -= instance.OnDash;
-            @Dash.canceled -= instance.OnDash;
+            @Block.started -= instance.OnBlock;
+            @Block.performed -= instance.OnBlock;
+            @Block.canceled -= instance.OnBlock;
             @Ultimate.started -= instance.OnUltimate;
             @Ultimate.performed -= instance.OnUltimate;
             @Ultimate.canceled -= instance.OnUltimate;
@@ -704,7 +704,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnCrouch(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnClick(InputAction.CallbackContext context);
-        void OnDash(InputAction.CallbackContext context);
+        void OnBlock(InputAction.CallbackContext context);
         void OnUltimate(InputAction.CallbackContext context);
     }
     public interface IGameManagerActions
