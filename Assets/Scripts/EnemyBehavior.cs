@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-
 public class EnemyBehavior : MonoBehaviour
 {
     public NavMeshAgent agent;
@@ -45,6 +44,8 @@ public class EnemyBehavior : MonoBehaviour
     private bool canTakeDamage = true;
     private bool isSandyActive = false; // New flag to track if Sandy is active
 
+    private Animator animator; // Reference to the Animator
+
     private void OnEnable()
     {
         AbilityHandler.OnSandyActivated += HandleSandyActivated;
@@ -61,6 +62,7 @@ public class EnemyBehavior : MonoBehaviour
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
         playerCamera = Camera.main;
+        animator = GetComponent<Animator>(); // Initialize the Animator reference
         StartCoroutine(FOVRoutine());
 
         if (attentionBar != null)
@@ -104,6 +106,7 @@ public class EnemyBehavior : MonoBehaviour
                     attentionCanvas.SetActive(false);
                 }
             }
+            animator.SetBool("See", false);
             return;
         }
 
@@ -123,6 +126,7 @@ public class EnemyBehavior : MonoBehaviour
                     if (!canSeePlayer)
                     {
                         canSeePlayer = true;
+                        animator.SetBool("See", true); // Set See to true when the enemy sees the player
                         if (attentionCoroutine == null)
                         {
                             attentionCoroutine = StartCoroutine(AttentionLevel());
@@ -137,16 +141,19 @@ public class EnemyBehavior : MonoBehaviour
                 else
                 {
                     canSeePlayer = false;
+                    animator.SetBool("See", false); // Set See to false when the enemy doesn't see the player
                 }
             }
             else
             {
                 canSeePlayer = false;
+                animator.SetBool("See", false); // Set See to false when the enemy doesn't see the player
             }
         }
         else
         {
             canSeePlayer = false;
+            animator.SetBool("See", false); // Set See to false when the enemy doesn't see the player
         }
 
         if (!canSeePlayer && attentionCoroutine != null)
@@ -236,6 +243,8 @@ public class EnemyBehavior : MonoBehaviour
 
         if (distanceToWalkPoint.magnitude < 1f)
             walkPointSet = false;
+
+        animator.SetBool("Run", false); // Set Run to false when patrolling
     }
 
     private void SearchWalkPoint()
@@ -253,6 +262,8 @@ public class EnemyBehavior : MonoBehaviour
     {
         Debug.Log("NPC found player");
         agent.SetDestination(player.position);
+        animator.SetBool("Run", true); // Set Run to true when chasing the player
+        animator.SetBool("See", true); // Set See to true when the enemy sees the player
     }
 
     private void AttackPlayer()
@@ -260,6 +271,9 @@ public class EnemyBehavior : MonoBehaviour
         agent.SetDestination(transform.position);
 
         transform.LookAt(player);
+
+        animator.SetBool("Run", false); // Set Run to false when attacking
+        animator.SetBool("See", true); // Set See to true when the enemy is attacking
 
         if (!alreadyAttacked)
         {

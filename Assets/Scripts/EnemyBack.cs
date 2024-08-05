@@ -67,10 +67,7 @@ public class EnemyBack : MonoBehaviour
     public void TriggerDeath()
     {
         animator.SetBool("Dead", true);
-        capsuleCollider.enabled = false;
-        enemyBehavior.enabled = false;
-        detectionUI.enabled = false;
-        boxCollider.enabled = false;
+
 
         if (bloodSplatter != null)
         {
@@ -95,10 +92,7 @@ public class EnemyBack : MonoBehaviour
     public void FrontDeath()
     {
         animator.SetBool("Dead", true);
-        capsuleCollider.enabled = false;
-        enemyBehavior.enabled = false;
-        detectionUI.enabled = false;
-        boxCollider.enabled = false;
+
 
         if (bloodSplatter != null)
         {
