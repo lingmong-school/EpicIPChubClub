@@ -1,9 +1,3 @@
-/*
-Author: Rayn Kamaludin
-Date: 25/7/2024
-Description: Check for player within vicinity to attack 
-*/
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,6 +25,13 @@ public class EnemyBack : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         capsuleCollider = GetComponent<CapsuleCollider>();
+        boxCollider = GetComponent<BoxCollider>();
+
+        if (animator == null) Debug.LogError("Animator not assigned.");
+        if (capsuleCollider == null) Debug.LogError("CapsuleCollider not assigned.");
+        if (boxCollider == null) Debug.LogError("BoxCollider not assigned.");
+        if (enemyBehavior == null) Debug.LogError("EnemyBehavior not assigned.");
+        if (detectionUI == null) Debug.LogError("Detection UI not assigned.");
     }
 
     /// <summary>
@@ -67,7 +68,10 @@ public class EnemyBack : MonoBehaviour
     public void TriggerDeath()
     {
         animator.SetBool("Dead", true);
-
+        capsuleCollider.enabled = false;
+        enemyBehavior.enabled = false;
+        detectionUI.enabled = false;
+        boxCollider.enabled = false;
 
         if (bloodSplatter != null)
         {
@@ -92,13 +96,15 @@ public class EnemyBack : MonoBehaviour
     public void FrontDeath()
     {
         animator.SetBool("Dead", true);
-
+        capsuleCollider.enabled = false;
+        enemyBehavior.enabled = false;
+        detectionUI.enabled = false;
+        boxCollider.enabled = false;
 
         if (bloodSplatter != null)
         {
             bloodSplatter.Play();
         }
-
 
         Debug.Log("Enemy death triggered, collider disabled, and effects played");
         StartCoroutine(DestroyAfterDelay());

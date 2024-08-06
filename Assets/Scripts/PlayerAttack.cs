@@ -10,7 +10,7 @@ using Climbing; // Add this to access MovementState and MovementCharacterControl
 /// </summary>
 public class PlayerAttack : MonoBehaviour
 {
-    public EnemyBack enemyBack; // Reference to the EnemyBack script
+    public List<EnemyBack> enemyBackList = new List<EnemyBack>(); // Reference to the EnemyBack scripts
     public HiddenBlade hiddenBlade; // Reference to the HiddenBlade script
     private PlayerControls controls;
     private Animator animator;
@@ -74,14 +74,18 @@ public class PlayerAttack : MonoBehaviour
             return; // Return if the player is not in walking or running state
         }
 
-        if (enemyBack != null && enemyBack.canAttack)
+        foreach (var enemyBack in enemyBackList)
         {
-            // Activate the hidden blade
-            hiddenBlade.ActivateBlade();
+            if (enemyBack != null && enemyBack.canAttack)
+            {
+                // Activate the hidden blade
+                hiddenBlade.ActivateBlade();
 
-            // Set the Backstab animation boolean to true
-            animator.SetBool("Backstab", true);
-            Debug.Log("Player attacks with Backstab");
+                // Set the Backstab animation boolean to true
+                animator.SetBool("Backstab", true);
+                Debug.Log("Player attacks with Backstab");
+                return;
+            }
         }
     }
 
@@ -103,9 +107,13 @@ public class PlayerAttack : MonoBehaviour
     /// </summary>
     public void Kill()
     {
-        if (enemyBack != null && enemyBack.canAttack)
+        foreach (var enemyBack in enemyBackList)
         {
-            enemyBack.TriggerDeath();
+            if (enemyBack != null && enemyBack.canAttack)
+            {
+                enemyBack.TriggerDeath();
+                return;
+            }
         }
     }
 
@@ -184,6 +192,30 @@ public class PlayerAttack : MonoBehaviour
         {
             vfx.transform.position = transform.position + new Vector3(0, 1, 0);
             vfx.Play();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            var enemyBack = other.GetComponent<EnemyBack>();
+            if (enemyBack != null && !enemyBackList.Contains(enemyBack))
+            {
+                enemyBackList.Add(enemyBack);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            var enemyBack = other.GetComponent<EnemyBack>();
+            if (enemyBack != null && enemyBackList.Contains(enemyBack))
+            {
+                enemyBackList.Remove(enemyBack);
+            }
         }
     }
 }
