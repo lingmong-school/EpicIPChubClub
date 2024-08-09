@@ -12,10 +12,16 @@ public class BossCutscene : MonoBehaviour
     public GameObject otherObjectWithDomain; // Reference to the other object with the Domain parameter
     private Animator otherAnimator; // Animator component of the other object
 
+    public AudioClip cutsceneStartSound; // Sound for the start of the cutscene
+    public AudioClip domainStartSound; // Sound for when "Domain" starts
+
+    private AudioSource audioSource; // AudioSource component
+
     // Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         if (animator == null)
         {
@@ -41,10 +47,21 @@ public class BossCutscene : MonoBehaviour
         {
             Debug.LogError("Other object with Domain parameter is not assigned.");
         }
+
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     private IEnumerator CutsceneSequence()
     {
+        // Play the cutscene start sound
+        if (cutsceneStartSound != null)
+        {
+            audioSource.PlayOneShot(cutsceneStartSound);
+        }
+
         // Enable the cutscene camera and set the "Cutscene" parameter to true
         if (cutsceneCamera != null)
         {
@@ -65,6 +82,12 @@ public class BossCutscene : MonoBehaviour
         // Set "talking" parameter to false
         animator.SetBool("Talking", false);
         Debug.Log("Talking ended");
+
+        // Play the domain start sound
+        if (domainStartSound != null)
+        {
+            audioSource.PlayOneShot(domainStartSound);
+        }
 
         // Set "Domain" parameter to true in both animators
         animator.SetBool("Domain", true);

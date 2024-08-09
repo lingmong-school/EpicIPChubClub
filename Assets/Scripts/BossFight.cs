@@ -29,6 +29,13 @@ public class BossFight : MonoBehaviour
     public ParticleSystem purpleAttackParticles;
     public GameObject rechargeParticleObject; // Reference to the GameObject containing the recharge particle system
 
+    // Audio sources and clips for abilities
+    private AudioSource audioSource; // AudioSource component
+    public AudioClip redAttackSound; // Sound for Red attack
+    public AudioClip blueAttackSound; // Sound for Blue attack
+    public AudioClip purpleAttackSound; // Sound for Purple attack
+    public AudioClip rechargeSound; // Sound for Recharge ability
+
     private void Awake()
     {
         player = GameObject.Find("PlayerObj").transform;
@@ -37,6 +44,12 @@ public class BossFight : MonoBehaviour
         bossHealthbar = GetComponentInChildren<BossHealthbar>(); // Get the BossHealthbar component
         bossAbility = GetComponent<BossAbility>(); // Get the BossAbility component
         capsuleCollider = GetComponent<CapsuleCollider>(); // Get the CapsuleCollider component
+        audioSource = GetComponent<AudioSource>(); // Get the AudioSource component
+
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource component is missing from the BossFight GameObject.");
+        }
     }
 
     private void OnEnable()
@@ -165,6 +178,7 @@ public class BossFight : MonoBehaviour
     public void RedPerformed()
     {
         if (redAttackParticles != null) redAttackParticles.Play();
+        PlaySoundEffect(redAttackSound);
     }
 
     public void BluePerformed()
@@ -174,16 +188,27 @@ public class BossFight : MonoBehaviour
             GameObject particleInstance = Instantiate(blueAttackParticlePrefab, transform.position, Quaternion.identity);
             Destroy(particleInstance, 3f); // Destroy the particle after 3 seconds
         }
+        PlaySoundEffect(blueAttackSound);
     }
 
     public void PurplePerformed()
     {
         if (purpleAttackParticles != null) purpleAttackParticles.Play();
+        PlaySoundEffect(purpleAttackSound);
     }
 
     public void ChargePerformed()
     {
         if (rechargeParticleObject != null) rechargeParticleObject.SetActive(true); // Enable the recharge particle system
+        PlaySoundEffect(rechargeSound);
+    }
+
+    private void PlaySoundEffect(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 
     private void FacePlayer()

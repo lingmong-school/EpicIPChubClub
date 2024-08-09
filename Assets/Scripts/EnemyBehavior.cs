@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+
 public class EnemyBehavior : MonoBehaviour
 {
     public NavMeshAgent agent;
@@ -48,6 +49,9 @@ public class EnemyBehavior : MonoBehaviour
     public ParticleSystem shootParticleEffect; // Particle system for shooting
     private HealthBar playerHealthBar; // Reference to the player's health bar
 
+    public AudioClip shootSound; // Audio clip for the shooting sound
+    private AudioSource audioSource; // AudioSource component
+
     private void OnEnable()
     {
         AbilityHandler.OnSandyActivated += HandleSandyActivated;
@@ -66,6 +70,13 @@ public class EnemyBehavior : MonoBehaviour
         playerHealthBar = playerRef.GetComponent<HealthBar>(); // Get the HealthBar component
         playerCamera = Camera.main;
         animator = GetComponent<Animator>(); // Initialize the Animator reference
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         StartCoroutine(FOVRoutine());
 
         if (attentionBar != null)
@@ -379,6 +390,12 @@ public class EnemyBehavior : MonoBehaviour
             if (shootParticleEffect != null)
             {
                 shootParticleEffect.Play();
+            }
+
+            // Play the shooting sound effect
+            if (shootSound != null)
+            {
+                audioSource.PlayOneShot(shootSound);
             }
 
             RaycastHit hit;
