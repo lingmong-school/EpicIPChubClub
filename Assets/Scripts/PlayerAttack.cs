@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.VFX; // Add this for Visual Effect Graph
-using Climbing; // Add this to access MovementState and MovementCharacterController
+using UnityEngine.VFX;
+using Climbing;
 
 /// <summary>
 /// Manages the player's attack input, allowing attacks only when the enemy can attack.
@@ -30,17 +30,32 @@ public class PlayerAttack : MonoBehaviour
     public VisualEffect swing2VFX;
     public VisualEffect swing3VFX;
 
+    // Audio Clips for each attack
+    public AudioClip attack1Sound;
+    public AudioClip attack2Sound;
+    public AudioClip attack3Sound;
+
+    private AudioSource audioSource; // Reference to the AudioSource component
+    private bool isAttacking = false; // Flag to indicate attack input
+
+    public bool IsAttacking
+    {
+        get { return isAttacking; }
+        private set { isAttacking = value; }
+    }
+
     private void Awake()
     {
         controls = new PlayerControls();
         controls.Player.Attack.performed += ctx => Attack();
         controls.Player.Click.performed += ctx => AttackM1();
         animator = GetComponent<Animator>();
-        movementCharacterController = GetComponent<MovementCharacterController>(); // Get the MovementCharacterController component
+        movementCharacterController = GetComponent<MovementCharacterController>();
 
-        if (animator.runtimeAnimatorController == null)
+        audioSource = GetComponent<AudioSource>(); // Initialize the AudioSource reference
+        if (audioSource == null)
         {
-            Debug.LogError("Animator does not have an AnimatorController assigned.");
+            audioSource = gameObject.AddComponent<AudioSource>();
         }
 
         // Ensure VFX components are assigned
@@ -78,11 +93,12 @@ public class PlayerAttack : MonoBehaviour
         {
             if (enemyBack != null && enemyBack.canAttack)
             {
-                // Activate the hidden blade
                 hiddenBlade.ActivateBlade();
-
-                // Set the Backstab animation boolean to true
                 animator.SetBool("Backstab", true);
+                IsAttacking = true;
+
+                PlayAttackSound(attack1Sound); // Play the sound for Backstab
+
                 Debug.Log("Player attacks with Backstab");
                 return;
             }
@@ -94,11 +110,10 @@ public class PlayerAttack : MonoBehaviour
     /// </summary>
     public void OnBackstabAnimationEnd()
     {
-        // Deactivate the hidden blade
         hiddenBlade.DeactivateBlade();
-
-        // Reset the Backstab animation boolean
         animator.SetBool("Backstab", false);
+        IsAttacking = false;
+
         Debug.Log("Backstab animation ended");
     }
 
@@ -132,12 +147,25 @@ public class PlayerAttack : MonoBehaviour
 
                 if (Time.time - lastClickedTime >= 0.2f)
                 {
-                    // Activate the hidden blade at the start of the attack
                     hiddenBlade.ActivateBlade();
 
                     animator.runtimeAnimatorController = combo[comboCounter].animatorOV;
                     animator.Play("Attack", 0, 0);
-                    // weapon.damage = combo[comboCounter].damage;
+
+                    // Play corresponding attack sound
+                    switch (comboCounter)
+                    {
+                        case 0:
+                            PlayAttackSound(attack1Sound);
+                            break;
+                        case 1:
+                            PlayAttackSound(attack2Sound);
+                            break;
+                        case 2:
+                            PlayAttackSound(attack3Sound);
+                            break;
+                    }
+
                     comboCounter++;
                     lastClickedTime = Time.time;
                     lastAttackTime = Time.time;
@@ -163,7 +191,6 @@ public class PlayerAttack : MonoBehaviour
     {
         comboCounter = 0;
         lastComboEnd = Time.time;
-        // Deactivate the hidden blade after the combo ends
         hiddenBlade.DeactivateBlade();
     }
 
@@ -192,6 +219,14 @@ public class PlayerAttack : MonoBehaviour
         {
             vfx.transform.position = transform.position + new Vector3(0, 1, 0);
             vfx.Play();
+        }
+    }
+
+    private void PlayAttackSound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
         }
     }
 

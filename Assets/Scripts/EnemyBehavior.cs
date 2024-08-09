@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+
 public class EnemyBehavior : MonoBehaviour
 {
     public NavMeshAgent agent;
@@ -45,6 +46,11 @@ public class EnemyBehavior : MonoBehaviour
     private bool isSandyActive = false; // New flag to track if Sandy is active
 
     private Animator animator; // Reference to the Animator
+    public ParticleSystem shootParticleEffect; // Particle system for shooting
+    private HealthBar playerHealthBar; // Reference to the player's health bar
+
+    public AudioClip shootSound; // Audio clip for the shooting sound
+    private AudioSource audioSource; // AudioSource component
 
     private void OnEnable()
     {
@@ -61,8 +67,16 @@ public class EnemyBehavior : MonoBehaviour
     private void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
+        playerHealthBar = playerRef.GetComponent<HealthBar>(); // Get the HealthBar component
         playerCamera = Camera.main;
         animator = GetComponent<Animator>(); // Initialize the Animator reference
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         StartCoroutine(FOVRoutine());
 
         if (attentionBar != null)
@@ -279,6 +293,16 @@ public class EnemyBehavior : MonoBehaviour
         {
             Debug.Log("NPC attack");
 
+            if (shootingCoroutine != null)
+            {
+                StopCoroutine(shootingCoroutine);
+            }
+
+            if (fullyDetected) // Check if the player is fully detected before starting to shoot
+            {
+                shootingCoroutine = StartCoroutine(ShootAtPlayer());
+            }
+
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
@@ -305,7 +329,7 @@ public class EnemyBehavior : MonoBehaviour
 
         if (health <= 0)
         {
-            Invoke(nameof(TriggerDeath), 0.5f);
+            TriggerDeath();
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -355,4 +379,37 @@ public class EnemyBehavior : MonoBehaviour
             animator.speed *= 2f; // Restore the animation speed
         }
     }
+
+    private IEnumerator ShootAtPlayer()
+    {
+        while (playerInAttackRange && canSeePlayer)
+        {
+            yield return new WaitForSeconds(0.5f); // Shoot every 0.5 seconds
+
+            // Play the shooting particle effect
+            if (shootParticleEffect != null)
+            {
+                shootParticleEffect.Play();
+            }
+
+            // Play the shooting sound effect
+            if (shootSound != null)
+            {
+                audioSource.PlayOneShot(shootSound);
+            }
+
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange, whatIsPlayer))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    Debug.Log("Player hit by enemy gun!");
+                    // Apply damage to the player
+                    playerHealthBar.TakeDamage(2);
+                }
+            }
+        }
+    }
+
+    private Coroutine shootingCoroutine;
 }

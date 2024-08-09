@@ -1,11 +1,11 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using Climbing; // Add this namespace import
+using Climbing;
+
 
 public class AbilityHandler : MonoBehaviour
 {
@@ -26,6 +26,10 @@ public class AbilityHandler : MonoBehaviour
     private ColorAdjustments colorAdjustments;
     private Vignette vignette;
 
+    public AudioClip blockSound;
+    public AudioClip sandySound;
+    private AudioSource audioSource;
+
     public static event System.Action OnSandyActivated;
     public static event System.Action OnSandyDeactivated;
 
@@ -34,6 +38,13 @@ public class AbilityHandler : MonoBehaviour
         controls = new PlayerControls();
         blockingScript = GetComponent<Blocking>();
         sandevistanScript = GetComponent<Sandevistan>();
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         if (globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
         {
             Debug.Log("Color Adjustments found in the Volume profile.");
@@ -97,6 +108,12 @@ public class AbilityHandler : MonoBehaviour
         Debug.Log("Block performed!");
         blockingScript.EnableBlock(1f);
 
+        // Play block sound effect
+        if (blockSound != null)
+        {
+            audioSource.PlayOneShot(blockSound);
+        }
+
         canBlock = false;
         if (blockCooldownIndicator != null)
         {
@@ -130,6 +147,12 @@ public class AbilityHandler : MonoBehaviour
         sandevistanScript.ActivateSandy();
         movementCharacterController.SetCurrentState(MovementState.Walking);
         OnSandyActivated?.Invoke();
+
+        // Play Sandevistan sound effect
+        if (sandySound != null)
+        {
+            audioSource.PlayOneShot(sandySound);
+        }
 
         if (colorAdjustments != null)
         {
