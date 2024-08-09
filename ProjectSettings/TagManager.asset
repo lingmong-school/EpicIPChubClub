@@ -13,6 +13,7 @@ TagManager:
   - BackstabKnife
   - Ground
   - Enemy
+  - Boss
   layers:
   - Default
   - TransparentFX

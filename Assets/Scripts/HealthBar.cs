@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,8 @@ public class HealthBar : MonoBehaviour
     public Image healthBarImage; // Reference to the health bar image
     public float maxHealth = 100f;
     private float currentHealth;
+
+    public GameObject shieldObject; // Reference to the shield GameObject
 
     void Start()
     {
@@ -16,9 +19,16 @@ public class HealthBar : MonoBehaviour
     // Call this method to apply damage
     public void TakeDamage(float damage)
     {
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        UpdateHealthBar();
+        if (shieldObject == null || !shieldObject.activeSelf)
+        {
+            currentHealth -= damage;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            UpdateHealthBar();
+        }
+        else
+        {
+            Debug.Log("Shield is active. Damage not applied.");
+        }
     }
 
     // Call this method to heal

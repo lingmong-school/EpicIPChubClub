@@ -1,10 +1,3 @@
-/*
- 
-Author: Rayn Kamaludin
-Date: 2/8/2024
-Description: Handles the blocking ability for the player.
-*/
-
 using System.Collections;
 using UnityEngine;
 
@@ -18,6 +11,8 @@ public class Blocking : MonoBehaviour
     /// </summary>
     public GameObject blockGameObject;
 
+    private HealthBar healthBar; // Reference to the HealthBar script
+
     /// <summary>
     /// Disables the block GameObject on start.
     /// </summary>
@@ -26,6 +21,21 @@ public class Blocking : MonoBehaviour
         if (blockGameObject != null)
         {
             blockGameObject.SetActive(false);
+        }
+
+        // Find and store the HealthBar script
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            healthBar = player.GetComponent<HealthBar>();
+            if (healthBar != null)
+            {
+                healthBar.shieldObject = blockGameObject; // Link the shield object to the HealthBar script
+            }
+        }
+        else
+        {
+            Debug.LogError("Player object with HealthBar script not found. Ensure the player has a HealthBar script and is tagged as 'Player'.");
         }
     }
 
@@ -45,8 +55,11 @@ public class Blocking : MonoBehaviour
     /// <returns>IEnumerator for the coroutine.</returns>
     private IEnumerator BlockCoroutine(float duration)
     {
-        blockGameObject.SetActive(true);
-        yield return new WaitForSeconds(duration);
-        blockGameObject.SetActive(false);
+        if (blockGameObject != null)
+        {
+            blockGameObject.SetActive(true);
+            yield return new WaitForSeconds(duration);
+            blockGameObject.SetActive(false);
+        }
     }
 }

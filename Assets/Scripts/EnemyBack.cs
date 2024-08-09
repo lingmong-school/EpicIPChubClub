@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX; // Add this namespace for Visual Effect Graph
 
@@ -21,6 +20,8 @@ public class EnemyBack : MonoBehaviour
     public ParticleSystem bloodSplatter; // Reference to the blood splatter particle system
     public VisualEffect visualEffect; // Reference to the Visual Effect component
 
+    private PlayerAttack playerAttack; // Reference to the PlayerAttack script
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -34,6 +35,12 @@ public class EnemyBack : MonoBehaviour
         if (detectionUI == null) Debug.LogError("Detection UI not assigned.");
     }
 
+    private void Start()
+    {
+        playerAttack = FindObjectOfType<PlayerAttack>();
+        if (playerAttack == null) Debug.LogError("PlayerAttack script not found in the scene.");
+    }
+
     /// <summary>
     /// Detects when the player enters the trigger zone.
     /// </summary>
@@ -44,7 +51,7 @@ public class EnemyBack : MonoBehaviour
         {
             canAttack = true;
         }
-        else if (other.CompareTag("BackstabKnife") && canAttack)
+        else if (other.CompareTag("BackstabKnife") && canAttack && playerAttack != null && playerAttack.IsAttacking)
         {
             TriggerDeath();
         }
@@ -63,10 +70,17 @@ public class EnemyBack : MonoBehaviour
     }
 
     /// <summary>
-    /// Triggers the death animation and plays the blood splatter and visual effects.
+    /// Triggers the death animation and plays the blood splatter and visual effects after a delay.
     /// </summary>
     public void TriggerDeath()
     {
+        StartCoroutine(TriggerDeathAfterDelay(0.7f));
+    }
+
+    private IEnumerator TriggerDeathAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
         animator.SetBool("Dead", true);
         capsuleCollider.enabled = false;
         enemyBehavior.enabled = false;
@@ -95,6 +109,13 @@ public class EnemyBack : MonoBehaviour
 
     public void FrontDeath()
     {
+        StartCoroutine(FrontDeathAfterDelay(0.5f));
+    }
+
+    private IEnumerator FrontDeathAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
         animator.SetBool("Dead", true);
         capsuleCollider.enabled = false;
         enemyBehavior.enabled = false;

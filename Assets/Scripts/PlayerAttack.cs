@@ -30,6 +30,14 @@ public class PlayerAttack : MonoBehaviour
     public VisualEffect swing2VFX;
     public VisualEffect swing3VFX;
 
+    private bool isAttacking = false; // Flag to indicate attack input
+
+    public bool IsAttacking
+    {
+        get { return isAttacking; }
+        private set { isAttacking = value; }
+    }
+
     private void Awake()
     {
         controls = new PlayerControls();
@@ -83,6 +91,10 @@ public class PlayerAttack : MonoBehaviour
 
                 // Set the Backstab animation boolean to true
                 animator.SetBool("Backstab", true);
+
+                // Set the isAttacking flag to true
+                IsAttacking = true;
+
                 Debug.Log("Player attacks with Backstab");
                 return;
             }
@@ -99,6 +111,10 @@ public class PlayerAttack : MonoBehaviour
 
         // Reset the Backstab animation boolean
         animator.SetBool("Backstab", false);
+
+        // Reset the isAttacking flag
+        IsAttacking = false;
+
         Debug.Log("Backstab animation ended");
     }
 
