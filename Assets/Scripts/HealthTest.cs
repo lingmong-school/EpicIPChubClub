@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HealthTest : MonoBehaviour
 {
-    public float damageAmount = 10f; // Amount of damage to apply to the player
+    public float damageAmount = 1000f; // Amount of damage to apply to the player
 
     private void OnCollisionEnter(Collision collision)
     {

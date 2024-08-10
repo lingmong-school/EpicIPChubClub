@@ -16,4 +16,9 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Exit game called"); // This will show in the editor's console
         Application.Quit(); // Quit the application
     }
+
+    public void BackMenu()
+    {
+        SceneManager.LoadScene(0); // Load Scene 1
+    }
 }

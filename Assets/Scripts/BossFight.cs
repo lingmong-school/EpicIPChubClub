@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement; // Add this to handle scene switching
 
 public class BossFight : MonoBehaviour
 {
@@ -265,6 +266,7 @@ public class BossFight : MonoBehaviour
     private IEnumerator DestroyAfterDelay()
     {
         yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(3); // Change to scene 3 after 2 seconds
         Destroy(gameObject);
     }
 

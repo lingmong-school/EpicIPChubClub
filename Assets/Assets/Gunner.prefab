@@ -2636,6 +2636,8 @@ MonoBehaviour:
   attentionTime: 5
   attentionCanvas: {fileID: 8703105572440416089}
   attentionBar: {fileID: 6562045226881975837}
+  shootParticleEffect: {fileID: 0}
+  shootSound: {fileID: 0}
 --- !u!1 &8169251607963639829
 GameObject:
   m_ObjectHideFlags: 0

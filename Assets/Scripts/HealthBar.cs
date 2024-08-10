@@ -1,6 +1,6 @@
-
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // Import SceneManager to handle scene loading
 
 public class HealthBar : MonoBehaviour
 {
@@ -24,6 +24,12 @@ public class HealthBar : MonoBehaviour
             currentHealth -= damage;
             currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
             UpdateHealthBar();
+
+            // Check if health has reached 0
+            if (currentHealth <= 0)
+            {
+                OnDeath();
+            }
         }
         else
         {
@@ -43,5 +49,12 @@ public class HealthBar : MonoBehaviour
     private void UpdateHealthBar()
     {
         healthBarImage.fillAmount = currentHealth / maxHealth;
+    }
+
+    // Method called when health reaches 0
+    private void OnDeath()
+    {
+        Debug.Log("Health reached 0. Changing to scene 4.");
+        SceneManager.LoadScene(4); // Load scene 4
     }
 }

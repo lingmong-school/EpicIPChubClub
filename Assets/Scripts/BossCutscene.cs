@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement; // Add this to handle scene switching
 
 public class BossCutscene : MonoBehaviour
 {
@@ -16,6 +17,12 @@ public class BossCutscene : MonoBehaviour
     public AudioClip domainStartSound; // Sound for when "Domain" starts
 
     private AudioSource audioSource; // AudioSource component
+
+    public float sceneSwitchDelay = 6f; // Time in seconds to wait before switching the scene
+    public Animator sceneTransitionAnimator; // Reference to the Animator on the Canvas
+
+    public BoxCollider boxColliderToDisable; // Reference to the BoxCollider to disable
+    public GameObject meshToDisable; // Reference to the GameObject (Mesh) to disable
 
     // Start is called before the first frame update
     void Start()
@@ -52,6 +59,23 @@ public class BossCutscene : MonoBehaviour
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
+
+        if (sceneTransitionAnimator == null)
+        {
+            Debug.LogError("Scene transition animator is not assigned.");
+        }
+
+        // Ensure the BoxCollider is enabled at the start
+        if (boxColliderToDisable != null)
+        {
+            boxColliderToDisable.enabled = true;
+        }
+
+        // Ensure the Mesh (GameObject) is enabled at the start
+        if (meshToDisable != null)
+        {
+            meshToDisable.SetActive(true);
+        }
     }
 
     private IEnumerator CutsceneSequence()
@@ -83,12 +107,6 @@ public class BossCutscene : MonoBehaviour
         animator.SetBool("Talking", false);
         Debug.Log("Talking ended");
 
-        // Play the domain start sound
-        if (domainStartSound != null)
-        {
-            audioSource.PlayOneShot(domainStartSound);
-        }
-
         // Set "Domain" parameter to true in both animators
         animator.SetBool("Domain", true);
         if (otherAnimator != null)
@@ -107,6 +125,27 @@ public class BossCutscene : MonoBehaviour
         }
 
         Debug.Log("Cutscene camera disabled");
+
+        // Play the domain start sound right before triggering the scene transition
+        if (domainStartSound != null)
+        {
+            audioSource.PlayOneShot(domainStartSound);
+        }
+
+        // Wait briefly to sync the sound with the animation trigger
+        yield return new WaitForSeconds(0.5f);
+
+        // Trigger the scene transition animation
+        if (sceneTransitionAnimator != null)
+        {
+            sceneTransitionAnimator.SetTrigger("Start");
+        }
+
+        // Wait for the transition animation duration
+        yield return new WaitForSeconds(sceneSwitchDelay);
+
+        // Load the new scene
+        SceneManager.LoadScene(2);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -116,5 +155,46 @@ public class BossCutscene : MonoBehaviour
             cutsceneStarted = true;
             StartCoroutine(CutsceneSequence());
         }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Trigger the end transition animation after the scene loads
+        if (sceneTransitionAnimator != null)
+        {
+            sceneTransitionAnimator.SetTrigger("End");
+            StartCoroutine(DisableAfterEndAnimation());
+        }
+
+        // Disable the specified BoxCollider and Mesh (GameObject) after the scene loads
+        if (boxColliderToDisable != null)
+        {
+            boxColliderToDisable.enabled = false;
+        }
+
+        if (meshToDisable != null)
+        {
+            meshToDisable.SetActive(false);
+        }
+    }
+
+    private IEnumerator DisableAfterEndAnimation()
+    {
+        // Wait until the end animation has finished
+        AnimatorStateInfo stateInfo = sceneTransitionAnimator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitUntil(() => stateInfo.IsName("End") && stateInfo.normalizedTime >= 1.0f);
+
+        // Disable the GameObject after the animation ends
+        gameObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

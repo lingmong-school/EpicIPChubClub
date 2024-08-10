@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: cf0691d759f37fc45ba477d4a7c38709
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/City.unity
+    guid: b60674f7b7eff1d40b4518d51acc764b
+  - enabled: 1
+    path: Assets/Scenes/Domain.unity
+    guid: e679254346027cc41a7ca8d1c4b9fa81
+  - enabled: 1
+    path: Assets/Scenes/Win.unity
+    guid: eabc1852b83ab1c4995dfb3da38b34ec
+  - enabled: 1
+    path: Assets/Scenes/Death.unity
+    guid: d622b75afb9ce8b45be126950d25529d
   m_configObjects: {}

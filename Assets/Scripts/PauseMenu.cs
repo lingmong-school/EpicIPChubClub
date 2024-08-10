@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 /*
 * Author: Rayn Bin Kamaludin
 * Date: 9/8/2024
@@ -12,6 +13,7 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pauseMenu;
+    public GameObject settingsMenu;
 
     private PlayerControls controls;
 
@@ -33,16 +35,18 @@ public class PauseMenu : MonoBehaviour
 
     void Start()
     {
-        // Start with the pause menu deactivated
+        // Start with the pause menu and settings menu deactivated
         pauseMenu.SetActive(false);
+        settingsMenu.SetActive(false);
     }
 
     void OnPause()
     {
         if (pauseMenu.activeSelf)
         {
-            // If the pause menu is active, deactivate it and resume the game
+            // If the pause menu is active, deactivate it, deactivate settings menu, and resume the game
             pauseMenu.SetActive(false);
+            settingsMenu.SetActive(false);
             Time.timeScale = 1f;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -55,6 +59,20 @@ public class PauseMenu : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
+    }
+
+    public void OpenSettingsMenu()
+    {
+        // Disable the pause menu and enable the settings menu
+        pauseMenu.SetActive(false);
+        settingsMenu.SetActive(true);
+    }
+
+    public void CloseSettingsMenu()
+    {
+        // Disable the settings menu and enable the pause menu
+        settingsMenu.SetActive(false);
+        pauseMenu.SetActive(true);
     }
 
     public void RestartGame()
