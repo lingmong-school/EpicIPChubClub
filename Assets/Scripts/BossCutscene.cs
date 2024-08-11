@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement; // Add this to handle scene switching
+using UnityEngine.UI; // Add this to handle UI components like Image
 
 public class BossCutscene : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class BossCutscene : MonoBehaviour
 
     public float sceneSwitchDelay = 6f; // Time in seconds to wait before switching the scene
     public Animator sceneTransitionAnimator; // Reference to the Animator on the Canvas
+    public Image transitionImage; // Reference to the Image component for the transition
 
     public BoxCollider boxColliderToDisable; // Reference to the BoxCollider to disable
     public GameObject meshToDisable; // Reference to the GameObject (Mesh) to disable
@@ -75,6 +77,18 @@ public class BossCutscene : MonoBehaviour
         if (meshToDisable != null)
         {
             meshToDisable.SetActive(true);
+        }
+
+        // Disable the transition image at the start
+        if (transitionImage != null)
+        {
+            transitionImage.enabled = false;
+        }
+
+        // Trigger the "End" animation at the start
+        if (sceneTransitionAnimator != null)
+        {
+            sceneTransitionAnimator.SetTrigger("End");
         }
     }
 
@@ -134,6 +148,12 @@ public class BossCutscene : MonoBehaviour
 
         // Wait briefly to sync the sound with the animation trigger
         yield return new WaitForSeconds(0.5f);
+
+        // Enable the transition image before triggering the transition animation
+        if (transitionImage != null)
+        {
+            transitionImage.enabled = true;
+        }
 
         // Trigger the scene transition animation
         if (sceneTransitionAnimator != null)
