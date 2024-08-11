@@ -5,7 +5,11 @@ using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 using Climbing;
 using UnityEngine.SceneManagement;
-
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 9/8/2024
+* Description: Manages the player's attack input and combo system, along with visual and audio effects.
+*/
 
 /// <summary>
 /// Manages the player's attack input, allowing attacks only when the enemy can attack.

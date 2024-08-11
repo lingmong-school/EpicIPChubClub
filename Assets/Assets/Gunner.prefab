@@ -2620,11 +2620,11 @@ MonoBehaviour:
   walkPointRange: 6.37
   timeBetweenAttacks: 5.26
   sightRange: 6.49
-  attackRange: 2.22
+  attackRange: 6.46
   playerInSightRange: 0
   playerInAttackRange: 0
   radius: 10.58
-  angle: 36
+  angle: 72
   playerRef: {fileID: 0}
   targetMask:
     serializedVersion: 2

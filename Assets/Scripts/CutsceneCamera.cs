@@ -1,5 +1,14 @@
-using System.Collections;
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/3/2024
+* Description: Controls the camera during cutscenes, including transitioning between camera angles.
+*/
+
 using UnityEngine;
+
+/// <summary>
+/// Controls the camera during cutscenes, including transitioning between camera angles.
+/// </summary>
 
 public class CutsceneCamera : MonoBehaviour
 {

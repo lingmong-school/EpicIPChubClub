@@ -1,3 +1,9 @@
+/*
+* Author: Sia Yong Hong
+* Date: 8/9/2024
+* Description: Manages the behavior of civilians within the game, including their reactions to the player's actions.
+*/
+
 
 using System.Collections;
 using UnityEngine;

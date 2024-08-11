@@ -1,5 +1,15 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/8/2024
+* Description: Manages the boss health bar UI, including updating it based on the boss's health.
+*/
+
 using UnityEngine;
 using UnityEngine.UI;
+
+/// <summary>
+/// Manages the boss health bar UI, including updating it based on the boss's health.
+/// </summary>
 
 
 public class BossHealthbar : MonoBehaviour

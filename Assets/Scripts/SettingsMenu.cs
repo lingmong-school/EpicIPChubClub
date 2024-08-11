@@ -1,3 +1,9 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 2024-08-03
+* Description: Manages the settings menu, including volume and mute settings.
+*/
+
 using UnityEngine;
 using UnityEngine.UI;
 

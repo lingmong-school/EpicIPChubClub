@@ -1,3 +1,9 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 7/8/2024
+* Description: Singleton GameManager that persists across scenes and controls game flow.
+*/
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -31,7 +37,7 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Destroy the GameManager if the current scene is 0, 1, 3, or 4
+        // Destroy the GameManager if the current scene is 0 , 3, or 4
         if (scene.buildIndex == 0 || scene.buildIndex == 3 || scene.buildIndex == 4)
         {
             Destroy(gameObject);

@@ -1,3 +1,9 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 2024-08-02
+* Description: Handles the Sandevistan effect in the game, creating ghost shadows of the player.
+*/
+
 using System.Collections;
 using UnityEngine;
 

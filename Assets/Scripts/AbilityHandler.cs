@@ -1,3 +1,9 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/6/2024
+* Description: Manages the player's abilities, including blocking and Sandevistan, with cooldowns and visual effects.
+*/
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -5,6 +11,11 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using Climbing;
+
+
+/// <summary>
+/// Handles various abilities such as blocking and Sandevistan, including cooldowns and visual effects.
+/// </summary>
 
 
 public class AbilityHandler : MonoBehaviour

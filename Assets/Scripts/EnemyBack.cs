@@ -2,9 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.VFX; // Add this namespace for Visual Effect Graph
 
-/// <summary>
-/// Handles the detection of the player within the enemy's trigger zone and the detection of the BackstabKnife.
-/// </summary>
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 6/8/2024
+* Description: Handles the detection of the player within the enemy's trigger zone and the detection of the BackstabKnife.
+*/
+
 public class EnemyBack : MonoBehaviour
 {
     [HideInInspector]
@@ -21,6 +24,9 @@ public class EnemyBack : MonoBehaviour
     public VisualEffect visualEffect; // Reference to the Visual Effect component
 
     private PlayerAttack playerAttack; // Reference to the PlayerAttack script
+
+    // Amount of health to heal when the enemy dies
+    public float healAmount = 5f;
 
     private void Awake()
     {
@@ -97,8 +103,42 @@ public class EnemyBack : MonoBehaviour
             visualEffect.Play();
         }
 
+        // Heal the player by the specified amount with a delay
+        StartCoroutine(HealPlayerWithDelay());
+
         Debug.Log("Enemy death triggered, collider disabled, and effects played");
         StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator HealPlayerWithDelay()
+    {
+        // First heal immediately
+        HealPlayer();
+
+        // Wait for 1 second before the second heal
+        yield return new WaitForSeconds(1f);
+
+        // Perform a second heal
+        HealPlayer();
+    }
+
+    private void HealPlayer()
+    {
+        // Find the player in the scene
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            HealthBar healthBar = player.GetComponent<HealthBar>();
+            if (healthBar != null)
+            {
+                healthBar.Heal(healAmount); // Heal the player
+                Debug.Log($"Player healed by {healAmount} HP.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Player not found in the scene.");
+        }
     }
 
     private IEnumerator DestroyAfterDelay()

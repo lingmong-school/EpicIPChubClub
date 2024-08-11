@@ -1,5 +1,15 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/12/2024
+* Description: Manages the boss character's abilities and their interaction with the player.
+*/
+
 using System.Collections;
 using UnityEngine;
+
+/// <summary>
+/// Manages the boss character's abilities and their interactions with the player.
+/// </summary>
 
 public class BossAbility : MonoBehaviour
 {

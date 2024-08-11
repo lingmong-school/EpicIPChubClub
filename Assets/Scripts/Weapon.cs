@@ -1,6 +1,13 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 2024-08-02
+* Description: Manages the weapon's behavior, including damage dealing.
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class Weapon : MonoBehaviour
 {

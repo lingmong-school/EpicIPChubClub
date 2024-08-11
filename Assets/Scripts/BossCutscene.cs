@@ -1,7 +1,17 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/7/2024
+* Description: Controls the boss cutscene, including scene transitions and visual/audio effects.
+*/
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement; // Add this to handle scene switching
 using UnityEngine.UI; // Add this to handle UI components like Image
+
+/// <summary>
+/// Controls the boss cutscene, including scene transitions and visual/audio effects.
+/// </summary>
 
 public class BossCutscene : MonoBehaviour
 {

@@ -1,9 +1,14 @@
+/*
+* Author: Nabil Aryan Bin Hairmann
+* Date: 2/8/2024
+* Description: Manages enemy behavior, including patrolling, chasing, and attacking the player.
+*/
+
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
-
 
 public class EnemyBehavior : MonoBehaviour
 {

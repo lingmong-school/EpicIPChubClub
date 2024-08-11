@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   postExposure:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 0.3
   contrast:
     m_OverrideState: 0
     m_Value: -68
@@ -26,8 +26,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   saturation:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 5
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43,8 +43,8 @@ MonoBehaviour:
   components:
   - {fileID: 6183106632264588350}
   - {fileID: 6588888033297308044}
-  - {fileID: -7808328302995292153}
   - {fileID: 7194863175543500359}
+  - {fileID: -7808328302995292153}
 --- !u!114 &6183106632264588350
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -88,10 +88,10 @@ MonoBehaviour:
     m_Value: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 1.71
+    m_Value: 2
   intensity:
     m_OverrideState: 1
-    m_Value: 0.08
+    m_Value: 0.3
   scatter:
     m_OverrideState: 0
     m_Value: 0.7

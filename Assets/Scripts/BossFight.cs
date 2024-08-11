@@ -3,6 +3,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement; // Add this to handle scene switching
 
+
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/2/2024
+* Description: Handles the logic for the boss fight, including health management, attack sequences, and interaction with the player.
+*/
+
+
 public class BossFight : MonoBehaviour
 {
     public NavMeshAgent agent;

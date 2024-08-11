@@ -1,3 +1,10 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/4/2024
+* Description: Handles the player's blocking ability, including enabling and disabling the block effect.
+*/
+
+
 using System.Collections;
 using UnityEngine;
 

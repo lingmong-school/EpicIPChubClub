@@ -1,6 +1,13 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 8/8/2024
+* Description: Manages the player's health bar UI, applying damage and healing effects.
+*/
+
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Import SceneManager to handle scene loading
+using UnityEngine.SceneManagement;
+
 
 public class HealthBar : MonoBehaviour
 {

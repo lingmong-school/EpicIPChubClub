@@ -1,6 +1,12 @@
+/*
+* Author: Rayn Bin Kamaludin
+* Date: 9/8/2024
+* Description: Handles the main menu interactions and scene loading.
+*/
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 public class MainMenu : MonoBehaviour
 {
