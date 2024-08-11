@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 using Climbing;
+using UnityEngine.SceneManagement;
+
 
 /// <summary>
 /// Manages the player's attack input, allowing attacks only when the enemy can attack.
@@ -38,6 +40,10 @@ public class PlayerAttack : MonoBehaviour
     private AudioSource audioSource; // Reference to the AudioSource component
     private bool isAttacking = false; // Flag to indicate attack input
 
+    public ParticleSystem sandyAffectedParticle; // Public ParticleSystem to be affected by Sandy
+
+    private bool isSandyActive = false; // Track if Sandy is active
+
     public bool IsAttacking
     {
         get { return isAttacking; }
@@ -67,11 +73,17 @@ public class PlayerAttack : MonoBehaviour
     private void OnEnable()
     {
         controls.Enable();
+        AbilityHandler.OnSandyActivated += HandleSandyActivated;
+        AbilityHandler.OnSandyDeactivated += HandleSandyDeactivated;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         controls.Disable();
+        AbilityHandler.OnSandyActivated -= HandleSandyActivated;
+        AbilityHandler.OnSandyDeactivated -= HandleSandyDeactivated;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     void Update()
@@ -227,6 +239,35 @@ public class PlayerAttack : MonoBehaviour
         if (clip != null && audioSource != null)
         {
             audioSource.PlayOneShot(clip);
+        }
+    }
+
+    private void HandleSandyActivated()
+    {
+        isSandyActive = true;
+        AdjustParticleSpeed(sandyAffectedParticle, 0.5f); // Slow down the public ParticleSystem by half
+    }
+
+    private void HandleSandyDeactivated()
+    {
+        isSandyActive = false;
+        AdjustParticleSpeed(sandyAffectedParticle, 1f); // Reset the public ParticleSystem to normal speed
+    }
+
+    private void AdjustParticleSpeed(ParticleSystem particle, float speedMultiplier)
+    {
+        if (particle != null)
+        {
+            var main = particle.main;
+            main.simulationSpeed = speedMultiplier; // Adjust the speed of the particle system
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "Domain")
+        {
+            Destroy(sandyAffectedParticle.gameObject); // Destroy the ParticleSystem when entering the "Domain" scene
         }
     }
 
